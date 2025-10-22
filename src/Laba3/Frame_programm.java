@@ -70,7 +70,6 @@ public class Frame_programm extends JFrame {
             JOptionPane.showMessageDialog(this, "Некорректные данные", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
-
     }
 
     Frame_programm(){
