@@ -6,46 +6,76 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.Vector;
 
 public class Frame_programm extends JFrame {
     private Object[][] data = {
             {"Xiaomi Mi Robot", "180 мин", "4000 Pa", 25000},
-            {"Roborock S7", "180 мин", "5100 Pa", "55000"},
-            {"iRobot Roomba", "75 мин", "1700 Pa", "45000"},
-            {"Samsung Jet Bot", "90 мин", "2100 Pa", "40000"}
-    };
-    DefaultTableModel tableModel;
-    ArrayList<Object[]> data1 = new ArrayList<>();
+            {"Roborock S7", "180 мин", "5100 Pa", 55000},
+            {"iRobot Roomba", "75 мин", "1700 Pa", 45000},
+            {"Samsung Jet Bot", "90 мин", "2100 Pa", 40000},
+            {"Samsung Jet Bot", "90 мин", "2100 Pa", 10000},
 
+    };
+
+    private DefaultTableModel tableModel;
 
     JTextField name_field = new JTextField();
     JTextField time_field = new JTextField();
     JTextField power_field = new JTextField();
     JTextField price_field = new JTextField();
 
+
+    private void getMostRobotID(){
+        Vector<Vector> a = tableModel.getDataVector();
+        int MostRobotPrice = (int) a.getFirst().get(3) ;
+        int currentID = 0;
+        for (int i = 1; i<a.size(); i++){
+            if ((int) a.get(i).get(3) < MostRobotPrice){
+                currentID = i;
+                MostRobotPrice = (int) a.get(i).get(3);
+            }
+
+        }
+        System.out.print(a.get(currentID));
+    }
+
+    private void getArifm(){
+        Vector<Vector> a = tableModel.getDataVector();
+        int sum = 0;
+        for (Vector i: a){
+            sum += (int) i.get(3);
+        }
+        float ar = sum/ (float)a.size();
+        System.out.print(ar);
+    }
+
+
+
+
     private void buttonAdded(){
-        String name = name_field.getText();
-        String time = time_field.getText();
-        String power = power_field.getText();
-        String price = price_field.getText();
-        Object[] obj = {name, time,power,price};
-        name_field.setText("");
-        time_field.setText("");
-        power_field.setText("");
-        price_field.setText("");
-        tableModel.addRow(obj);
+        try {
+            String name = name_field.getText();
+            String time = time_field.getText();
+            String power = power_field.getText();
+            int price =Integer.parseInt(price_field.getText());
+            Object[] obj = {name, time,power,price};
+            name_field.setText("");
+            time_field.setText("");
+            power_field.setText("");
+            price_field.setText("");
+            tableModel.addRow(obj);
+        }
+        catch (Exception ex)  {
+            JOptionPane.showMessageDialog(this, "Некорректные данные", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
 
     }
 
     Frame_programm(){
         JPanel main_panel = new JPanel(new BorderLayout());
         main_panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-
-
-        for (int i=0; i<data.length;i++ ){
-            data1.add(data[i]);
-        }
 
 
         String[] tableHeader = new String[]{"Модель", "Время работы", "Мощность всасывания", "Цена (руб)"};
@@ -56,6 +86,7 @@ public class Frame_programm extends JFrame {
             }
         };
         JTable table = new JTable(tableModel);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollPane = new JScrollPane(table);
 
@@ -65,21 +96,31 @@ public class Frame_programm extends JFrame {
         JPanel leftPanelWButton = new JPanel(new BorderLayout(0,5));
         leftPanelWButton.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-        JButton button1 = new JButton("Кнопка 1");
-        JButton button2 = new JButton("Кнопка 2");
+        JButton button1 = new JButton("Самый бюджетный");
+        button1.addActionListener(e -> getMostRobotID());
+        JButton button2 = new JButton("Средняя цена");
+        button2.addActionListener(e -> getArifm());
         JButton exportPDF = new JButton("Экспортировать в pdf");
-        JButton deleate = new JButton("Удалить строку");
+        JButton delete = new JButton("Удалить строку");
+        delete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Functional.deleteRowFromTable(table.getSelectedRow(), tableModel);
+            }
+        });
 
-        JPanel panelButton = new JPanel(new BorderLayout());
+        JPanel panelButton = new JPanel(new BorderLayout(0,10));
 
         JLabel labelReturn = new JLabel("КАКА");
-//        labelReturn.setSize(new Dimension(panelButton.getWidth(), 150));
+        labelReturn.setHorizontalAlignment(JLabel.CENTER);
+
+
 
         JPanel panelWithButton = new JPanel(new GridLayout(2,2,5,5));
         panelWithButton.add(button1);
         panelWithButton.add(button2);
         panelWithButton.add(exportPDF);
-        panelWithButton.add(deleate);
+        panelWithButton.add(delete);
 
         panelButton.add(panelWithButton, BorderLayout.CENTER);
         panelButton.add(labelReturn, BorderLayout.SOUTH);
@@ -99,8 +140,6 @@ public class Frame_programm extends JFrame {
         });
 
 
-
-
         left_panel.add(name);
         left_panel.add(name_field);
         left_panel.add(timeWork);
@@ -113,9 +152,15 @@ public class Frame_programm extends JFrame {
         leftPanelWButton.add(left_panel, BorderLayout.CENTER);
         leftPanelWButton.add(buttonAdd, BorderLayout.SOUTH);
 
-        nort_panel.add(leftPanelWButton);
-        nort_panel.add(panelButton);
+
+        panelButton.setBorder(BorderFactory.createEmptyBorder(20,40,10,10));
+
+        nort_panel.setLayout(new BorderLayout());
+        nort_panel.setBorder(BorderFactory.createMatteBorder(5,5,5,5, Color.BLACK));
+        nort_panel.add(leftPanelWButton, BorderLayout.WEST);
+        nort_panel.add(panelButton, BorderLayout.EAST);
         nort_panel.setBackground(Color.BLACK);
+
         main_panel.add(nort_panel, BorderLayout.NORTH);
         main_panel.add(scrollPane, BorderLayout.CENTER);
 

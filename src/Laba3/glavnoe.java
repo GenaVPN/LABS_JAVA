@@ -1,7 +1,8 @@
 package Laba3;
 
 public class glavnoe {
+    static Frame_programm obj;
     public static void main(String[] args) {
-        new Frame_programm();
+        obj =  new Frame_programm();
     }
 }
